@@ -2,6 +2,9 @@
 
 namespace App\Orchid\Screens;
 
+use App\Models\Product;
+use App\Orchid\Layouts\ProductListLayout;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 
 class ProductListScreen extends Screen
@@ -13,7 +16,9 @@ class ProductListScreen extends Screen
      */
     public function query(): iterable
     {
-        return [];
+        return [
+            'products' => Product::paginate(10),
+        ];
     }
 
     /**
@@ -23,7 +28,12 @@ class ProductListScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'ProductListScreen';
+        return 'Listado de Productos';
+    }
+
+    public function description(): ?string
+    {
+        return 'Listado general de productos disponibles en el inventario.';
     }
 
     /**
@@ -33,7 +43,11 @@ class ProductListScreen extends Screen
      */
     public function commandBar(): iterable
     {
-        return [];
+        return [
+            Link::make('Nuevo Producto')
+                ->icon('boxes')
+                ->route('platform.product.edit')
+        ];
     }
 
     /**
@@ -43,6 +57,8 @@ class ProductListScreen extends Screen
      */
     public function layout(): iterable
     {
-        return [];
+        return [
+            ProductListLayout::class,
+        ];
     }
 }
