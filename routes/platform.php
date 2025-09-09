@@ -103,7 +103,7 @@ Route::screen('roles', RoleListScreen::class)
         ->push(__('Roles'), route('platform.systems.roles')));
 
 // Rutas para compay edicion y listado
-Route::screen('company/{company?}', CompanyEditScreen::class, 'platform.screens.company');
+Route::screen('company/{company?}', CompanyEditScreen::class, 'platform.screens.company')->name('platform.company.edit');
 Route::screen('companies', CompanyListScreen::class, 'platform.screens.companies')->name('platform.companies.list');
 //Rutas para customer edicion y listado
 Route::screen('customer/{customer?}', CustomerEditScreen::class, 'platform.screens.customer');
