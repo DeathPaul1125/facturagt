@@ -15,14 +15,26 @@ use App\Orchid\Screens\Examples\ExampleGridScreen;
 use App\Orchid\Screens\Examples\ExampleLayoutsScreen;
 use App\Orchid\Screens\Examples\ExampleScreen;
 use App\Orchid\Screens\Examples\ExampleTextEditorsScreen;
+use App\Orchid\Screens\InvoicePurchaseEditScreen;
+use App\Orchid\Screens\InvoicePurchaseListScreen;
 use App\Orchid\Screens\InvoiceSaleEditScreen;
 use App\Orchid\Screens\InvoiceSaleListScreen;
 use App\Orchid\Screens\PlatformScreen;
+use App\Orchid\Screens\ProductEditScreen;
+use App\Orchid\Screens\ProductListScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
+use App\Orchid\Screens\StockEditScreen;
+use App\Orchid\Screens\StockListScreen;
+use App\Orchid\Screens\StockMovementsEditScreen;
+use App\Orchid\Screens\StockMovementsListScreen;
+use App\Orchid\Screens\SupplierEditScreen;
+use App\Orchid\Screens\SupplierListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
+use App\Orchid\Screens\WharehouseEditScreen;
+use App\Orchid\Screens\WharehouseListScreen;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
 
@@ -91,29 +103,29 @@ Route::screen('roles', RoleListScreen::class)
         ->push(__('Roles'), route('platform.systems.roles')));
 
 // Rutas para compay edicion y listado
-Route::screen('company', CompanyEditScreen::class, 'platform.screens.company');
-Route::screen('companies', CompanyListScreen::class, 'platform.screens.companies');
+Route::screen('company/{company?}', CompanyEditScreen::class, 'platform.screens.company');
+Route::screen('companies', CompanyListScreen::class, 'platform.screens.companies')->name('platform.companies.list');
 //Rutas para customer edicion y listado
-Route::screen('customer', CustomerEditScreen::class, 'platform.screens.customer');
-Route::screen('customers', CustomerListScreen::class, 'platform.screens.customers');
+Route::screen('customer/{customer?}', CustomerEditScreen::class, 'platform.screens.customer');
+Route::screen('customers', CustomerListScreen::class, 'platform.screens.customers')->name('platform.customer.list');
 //Rutas para Invoice Sales edicion y listado
-Route::screen('invoice-sale', InvoiceSaleEditScreen::class, 'platform.screens.invoice-sale');
-Route::screen('invoice-sales', InvoiceSaleListScreen::class, 'platform.screens.invoice-sales');
+Route::screen('invoice-sale/{invoice-sale?}', InvoiceSaleEditScreen::class, 'platform.screens.invoice-sale');
+Route::screen('invoice-sales', InvoiceSaleListScreen::class, 'platform.screens.invoice-sales')->name('platform.invoicesale.list');
 //Rlutes para Invoice Purchase
-Route::screen('invoice-purchase', InvoiceSaleEditScreen::class, 'platform.screens.invoice-purchase');
-Route::screen('invoice-purchases', InvoiceSaleListScreen::class, 'platform.screens.invoice-purchases');
+Route::screen('invoice-purchase/{invoice-purchase?}', InvoicePurchaseEditScreen::class, 'platform.screens.invoice-purchase');
+Route::screen('invoice-purchases', InvoicePurchaseListScreen::class, 'platform.screens.invoice-purchases')->name('platform.invoicepurchases.list');
 //Route para Product
-Route::screen('product', InvoiceSaleEditScreen::class, 'platform.screens.product');
-Route::screen('products', InvoiceSaleListScreen::class, 'platform.screens.products');
+Route::screen('product/{product?}', ProductEditScreen::class, 'platform.screens.product');
+Route::screen('products', ProductListScreen::class, 'platform.screens.products')->name('platform.products.list');
 //Route para Stock
-Route::screen('stock', InvoiceSaleEditScreen::class, 'platform.screens.stock');
-Route::screen('stocks', InvoiceSaleListScreen::class, 'platform.screens.stocks');
+Route::screen('stock/{stock}', StockEditScreen::class, 'platform.screens.stock');
+Route::screen('stocks', StockListScreen::class, 'platform.screens.stocks')->name('platform.stocks.list');
 //Route para Movements Stocks
-Route::screen('movement-stock', InvoiceSaleEditScreen::class, 'platform.screens.movement-stock');
-Route::screen('movement-stocks', InvoiceSaleListScreen::class, 'platform.screens.movement-stocks');
+Route::screen('movement-stock/{movement-stock?}', StockMovementsEditScreen::class, 'platform.screens.movement-stock');
+Route::screen('movement-stocks', StockMovementsListScreen::class, 'platform.screens.movement-stocks')->name('platform.movement-stocks.list');
 //Routes para Supplier
-Route::screen('supplier', CustomerEditScreen::class, 'platform.screens.supplier');
-Route::screen('suppliers', CustomerListScreen::class, 'platform.screens.suppliers');
+Route::screen('supplier/{supplier}', SupplierEditScreen::class, 'platform.screens.supplier');
+Route::screen('suppliers', SupplierListScreen::class, 'platform.screens.suppliers')->name('platform.supplier.list');
 //Route para Wharehouse
-Route::screen('wharehouse', InvoiceSaleEditScreen::class, 'platform.screens.wharehouse');
-Route::screen('wharehouses', InvoiceSaleListScreen::class, 'platform.screens.wharehouses');
+Route::screen('wharehouse/{wharehouse?}', WharehouseEditScreen::class, 'platform.screens.wharehouse');
+Route::screen('wharehouses', WharehouseListScreen::class, 'platform.screens.wharehouses')->name('platform.wharehouses.list');

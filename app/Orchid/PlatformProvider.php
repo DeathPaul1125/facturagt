@@ -35,9 +35,65 @@ class PlatformProvider extends OrchidServiceProvider
     {
         return [
             Menu::make('Clientes')
-                ->icon('bs.book')
-                ->title('Navigation')
-                ->route(config('platform.index')),
+                ->icon('bs.person-rolodex')
+                ->title('Ventas')
+                ->badge(function () {
+                    return \App\Models\Customer::count();
+                }, Color::INFO())
+                ->route('platform.customer.list'),
+
+            Menu::make('Facturas')
+                ->icon('bs.file-earmark-text')
+                ->badge(function () {
+                    return \App\Models\InvoiceSale::count();
+                }, Color::INFO())
+                ->route('platform.invoicesale.list'),
+
+            Menu::make('Proveedores')
+                ->icon('bs.person-rolodex')
+                ->title('Compras')
+                ->badge(function () {
+                    return \App\Models\Supplier::count();
+                }, Color::WARNING())
+                ->route('platform.supplier.list'),
+
+            Menu::make('Facturas')
+                ->icon('bs.file-earmark-text')
+                ->badge(function () {
+                    return \App\Models\InvoicePurchase::count();
+                }, Color::WARNING())
+                ->route('platform.invoicepurchases.list'),
+
+            Menu::make('Almacenes')
+                ->title('Almacenes')
+                ->icon('bs.shop')
+                ->badge(function () {
+                    return \App\Models\Wharehouse::count();
+                }, Color::SUCCES())
+                ->route('platform.wharehouses.list'),
+
+            Menu::make('Productos')
+                ->icon('bs.box-seam')
+                ->badge(function () {
+                    return \App\Models\Product::count();
+                }, Color::SUCCES())
+                ->route('platform.products.list'),
+
+            Menu::make('Movimientos de Stock')
+                ->icon('bs.boombox-fill')
+                ->badge(function () {
+                    return \App\Models\StockMovements::count();
+                }, Color::SUCCES())
+                ->route('platform.movement-stocks.list'),
+
+            Menu::make('Configuracion')
+                ->title('Empresas')
+                ->icon('bs.building')
+                ->badge(function () {
+                    return \App\Models\Company::count();
+                    }, Color::PRIMARY())
+                ->route('platform.companies.list'),
+
 
 
             Menu::make(__('Users'))
