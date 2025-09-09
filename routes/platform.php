@@ -106,7 +106,7 @@ Route::screen('roles', RoleListScreen::class)
 Route::screen('company/{company?}', CompanyEditScreen::class, 'platform.screens.company')->name('platform.company.edit');
 Route::screen('companies', CompanyListScreen::class, 'platform.screens.companies')->name('platform.companies.list');
 //Rutas para customer edicion y listado
-Route::screen('customer/{customer?}', CustomerEditScreen::class, 'platform.screens.customer');
+Route::screen('customer/{customer?}', CustomerEditScreen::class, 'platform.screens.customer')->name('platform.customer.edit');
 Route::screen('customers', CustomerListScreen::class, 'platform.screens.customers')->name('platform.customer.list');
 //Rutas para Invoice Sales edicion y listado
 Route::screen('invoice-sale/{invoice-sale?}', InvoiceSaleEditScreen::class, 'platform.screens.invoice-sale');
@@ -124,7 +124,7 @@ Route::screen('stocks', StockListScreen::class, 'platform.screens.stocks')->name
 Route::screen('movement-stock/{movement-stock?}', StockMovementsEditScreen::class, 'platform.screens.movement-stock');
 Route::screen('movement-stocks', StockMovementsListScreen::class, 'platform.screens.movement-stocks')->name('platform.movement-stocks.list');
 //Routes para Supplier
-Route::screen('supplier/{supplier}', SupplierEditScreen::class, 'platform.screens.supplier');
+Route::screen('supplier/{supplier?}', SupplierEditScreen::class, 'platform.screens.supplier')->name('platform.supplier.edit');
 Route::screen('suppliers', SupplierListScreen::class, 'platform.screens.suppliers')->name('platform.supplier.list');
 //Route para Wharehouse
 Route::screen('wharehouse/{wharehouse?}', WharehouseEditScreen::class, 'platform.screens.wharehouse')->name('platform.wharehouse.edit');

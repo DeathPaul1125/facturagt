@@ -48,7 +48,7 @@ class CustomerListScreen extends Screen
     {
         return [
             Link::make('Nuevo Cliente')
-                ->icon('pencil')
+                ->icon('person-plus')
                 ->route('platform.customer.edit')
         ];
     }

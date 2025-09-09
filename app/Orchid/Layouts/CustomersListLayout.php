@@ -2,6 +2,8 @@
 
 namespace App\Orchid\Layouts;
 
+use App\Models\Customer;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
 
@@ -31,12 +33,22 @@ class CustomersListLayout extends Table
             TD::make('name', 'Nombre')
                 ->sort()
                 ->filter(TD::FILTER_TEXT),
-            TD::make('email', 'Email')
+            TD::make('address', 'Direccion')
                 ->sort()
                 ->filter(TD::FILTER_TEXT),
-            TD::make('phone', 'Teléfono')
+            TD::make('phone', 'Telefono')
                 ->sort()
                 ->filter(TD::FILTER_TEXT),
+            TD::make('phone2', 'Teléfono 2')
+                ->sort()
+                ->filter(TD::FILTER_TEXT),
+            TD::make('actions', 'Acciones')
+                ->alignRight()
+                ->render(function (Customer $customer) {
+                    return Link::make('Editar')
+                        ->class('btn btn-info')
+                        ->route('platform.customer.edit', $customer);
+                }),
         ];
     }
 }

@@ -2,7 +2,10 @@
 
 namespace App\Orchid\Screens;
 
+use App\Orchid\Layouts\SupplierListLayout;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
+use App\Models\Customer;
 
 class SupplierListScreen extends Screen
 {
@@ -13,7 +16,9 @@ class SupplierListScreen extends Screen
      */
     public function query(): iterable
     {
-        return [];
+        return [
+            'suppliers' => Customer::paginate(10),
+        ];
     }
 
     /**
@@ -33,7 +38,11 @@ class SupplierListScreen extends Screen
      */
     public function commandBar(): iterable
     {
-        return [];
+        return [
+            Link::make('Nuevo Proveedor')
+                ->icon('person-plus')
+                ->route('platform.supplier.edit')
+        ];
     }
 
     /**
@@ -43,6 +52,8 @@ class SupplierListScreen extends Screen
      */
     public function layout(): iterable
     {
-        return [];
+        return [
+            SupplierListLayout::class,
+        ];
     }
 }
