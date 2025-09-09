@@ -115,7 +115,7 @@ Route::screen('invoice-sales', InvoiceSaleListScreen::class, 'platform.screens.i
 Route::screen('invoice-purchase/{invoice-purchase?}', InvoicePurchaseEditScreen::class, 'platform.screens.invoice-purchase');
 Route::screen('invoice-purchases', InvoicePurchaseListScreen::class, 'platform.screens.invoice-purchases')->name('platform.invoicepurchases.list');
 //Route para Product
-Route::screen('product/{product?}', ProductEditScreen::class, 'platform.screens.product');
+Route::screen('product/{product?}', ProductEditScreen::class, 'platform.screens.product')->name('platform.product.edit');
 Route::screen('products', ProductListScreen::class, 'platform.screens.products')->name('platform.products.list');
 //Route para Stock
 Route::screen('stock/{stock}', StockEditScreen::class, 'platform.screens.stock');
