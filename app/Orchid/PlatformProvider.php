@@ -86,8 +86,8 @@ class PlatformProvider extends OrchidServiceProvider
                 }, Color::SUCCES())
                 ->route('platform.movement-stocks.list'),
 
-            Menu::make('Configuracion')
-                ->title('Empresas')
+            Menu::make('Empresas')
+                ->title('Configuración')
                 ->icon('bs.building')
                 ->badge(function () {
                     return \App\Models\Company::count();
