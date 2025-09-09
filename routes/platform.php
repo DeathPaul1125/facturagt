@@ -127,5 +127,5 @@ Route::screen('movement-stocks', StockMovementsListScreen::class, 'platform.scre
 Route::screen('supplier/{supplier}', SupplierEditScreen::class, 'platform.screens.supplier');
 Route::screen('suppliers', SupplierListScreen::class, 'platform.screens.suppliers')->name('platform.supplier.list');
 //Route para Wharehouse
-Route::screen('wharehouse/{wharehouse?}', WharehouseEditScreen::class, 'platform.screens.wharehouse');
+Route::screen('wharehouse/{wharehouse?}', WharehouseEditScreen::class, 'platform.screens.wharehouse')->name('platform.wharehouse.edit');
 Route::screen('wharehouses', WharehouseListScreen::class, 'platform.screens.wharehouses')->name('platform.wharehouses.list');
