@@ -8,6 +8,8 @@ use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Group;
 use Orchid\Screen\Fields\Input;
+use Orchid\Screen\Fields\Password;
+use Orchid\Screen\Fields\RadioButtons;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
@@ -60,12 +62,12 @@ class CompanyEditScreen extends Screen
                 ->method('createOrUpdate')
                 ->canSee(!$this->company->exists),
 
-            Button::make('Update')
-                ->icon('note')
+            Button::make('Editar')
+                ->icon('building-fill-gear')
                 ->method('createOrUpdate')
                 ->canSee($this->company->exists),
 
-            Button::make('Remove')
+            Button::make('Eliminar')
                 ->icon('trash')
                 ->method('remove')
                 ->canSee($this->company->exists),
@@ -147,6 +149,9 @@ class CompanyEditScreen extends Screen
 
                 ])->widthColumns('1fr 1fr 1fr 1fr'),
 
+            ]),
+
+            Layout::rows([
                 Group::make([
 
                     Input::make('user_fel')
@@ -154,21 +159,29 @@ class CompanyEditScreen extends Screen
                         ->placeholder('Usuario FEL')
                         ->value($this->company->user_fel),
 
-                    Input::make('password_fel')
+                    Password::make('company.password_fel')
                         ->title('Password FEL')
                         ->placeholder('Password FEL')
                         ->value($this->company->password_fel),
 
+                    RadioButtons::make('produccion')
+                        ->options([
+                            1 => 'Produccion',
+                            0 => 'Desarrollo',
+                        ])
+                        ->help('Servidor de pruebas o produccion')
+                    ->value($this->company->produccion),
+                ]),
+
+                Group::make([
                     TextArea::make('token_fel')
                         ->title('Token FEL')
                         ->placeholder('Token FEL')
-                        ->value($this->company->token_fel),
+                        ->value($this->company->token_fel)
+                        ->rows(5)
+                ])->widthColumns('1fr'),
 
-                    CheckBox::make('produccion')
-                        ->title('Produccion FEL')
-                        ->value($this->company->produccion),
-                ])
-            ])
+            ])->title('Configuracion FEL'),
         ];
     }
 
