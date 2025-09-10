@@ -24,7 +24,7 @@ class PlatformScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'Get Started';
+        return 'FacturaGT Dashboard';
     }
 
     /**
@@ -32,7 +32,7 @@ class PlatformScreen extends Screen
      */
     public function description(): ?string
     {
-        return 'Welcome to your Orchid application.';
+        return 'Panel principal del ERP lite.';
     }
 
     /**
@@ -53,7 +53,6 @@ class PlatformScreen extends Screen
     public function layout(): iterable
     {
         return [
-            Layout::view('platform::partials.update-assets'),
             Layout::view('platform::partials.welcome'),
         ];
     }

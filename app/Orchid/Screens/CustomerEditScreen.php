@@ -3,6 +3,7 @@
 namespace App\Orchid\Screens;
 
 use App\Models\Customer;
+use Orchid\Support\Color;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\Group;
@@ -54,8 +55,9 @@ class CustomerEditScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-            Button::make('Crear Cliente')
-                ->icon('pencil')
+            Button::make('Nuevo')
+                ->icon('person-plus-fill')
+                ->class('btn btn-success')
                 ->method('createOrUpdate')
                 ->canSee(!$this->customer->exists),
 
@@ -83,8 +85,8 @@ class CustomerEditScreen extends Screen
         return [
             Layout::rows([
                 Button::make('Consulta Nit')
-                    ->icon('magnifier')
                     ->method('consultaNit')
+                    ->icon('search')
                     ->class('btn btn-warning')
                     ->style('margin-top: 30px; margin-bottom: 0px;'),
                 Group::make([
@@ -116,7 +118,14 @@ class CustomerEditScreen extends Screen
                 Input::make('customer.phone2')
                     ->title('Teléfono 2')
                     ->placeholder('Segundo teléfono del cliente'),
-            ])
+
+                Button::make('Guardar')
+                    ->icon('check')
+                    ->class('btn btn-primary')
+                    ->method('createOrUpdate')
+                    ->type(Color::BASIC),
+            ]),
+
         ];
     }
 

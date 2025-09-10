@@ -39,7 +39,7 @@ class SupplierListScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-            Link::make('Nuevo Proveedor')
+            Link::make('Nuevo')
                 ->icon('person-plus')
                 ->route('platform.supplier.edit')
         ];
