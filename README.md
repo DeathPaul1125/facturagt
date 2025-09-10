@@ -18,7 +18,7 @@ Un sistema **ERP Lite** desarrollado con [Laravel](https://laravel.com) y [Orchi
 ---
 
 
-### Dashboard
+### Dashboard del sistema
 ![Dashboard](screenshots/Dashboard.png)
 
 ### Configuracion Empresa
