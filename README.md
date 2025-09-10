@@ -16,3 +16,10 @@ Un sistema **ERP Lite** desarrollado con [Laravel](https://laravel.com) y [Orchi
 - 🏢 **Multiempresa (multi-tenant en el futuro)**
 
 ---
+
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Configuracion Empresa
+![Login](screenshots/Empresa.png)
