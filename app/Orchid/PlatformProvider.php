@@ -47,7 +47,7 @@ class PlatformProvider extends OrchidServiceProvider
                 ->badge(function () {
                     return \App\Models\InvoiceSale::count();
                 }, Color::INFO())
-                ->route('platform.invoicesale.list'),
+                ->route('platform.invoice.sale.list'),
 
             Menu::make('Proveedores')
                 ->icon('bs.person-rolodex')

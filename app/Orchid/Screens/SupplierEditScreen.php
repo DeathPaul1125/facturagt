@@ -103,12 +103,11 @@ class SupplierEditScreen extends Screen
             ])
         ];
     }
-
     /**
      * Create or update the supplier.
      *
      * @param Request $request
-     * @return \Illuminate\0Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function createOrUpdate(Request $request)
     {
