@@ -2,6 +2,9 @@
 
 namespace App\Orchid\Screens;
 
+use App\Models\InvoiceSale;
+use App\Orchid\Layouts\InvoiceSalesListLayout;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 
 class InvoiceSaleListScreen extends Screen
@@ -13,7 +16,9 @@ class InvoiceSaleListScreen extends Screen
      */
     public function query(): iterable
     {
-        return [];
+        return [
+            'invoice_sales' => InvoiceSale::paginate(10),
+        ];
     }
 
     /**
@@ -27,13 +32,25 @@ class InvoiceSaleListScreen extends Screen
     }
 
     /**
+     * The description is displayed on the user's screen under the heading
+     */
+    public function description(): ?string
+    {
+        return "Aquí puedes ver y gestionar todas las facturas de venta registradas en el sistema.";
+    }
+
+    /**
      * The screen's action buttons.
      *
      * @return \Orchid\Screen\Action[]
      */
     public function commandBar(): iterable
     {
-        return [];
+        return [
+            Link::make('Nueva Factura')
+                ->icon('receipt-cutoff')
+                ->route('platform.invoice.sale.edit')
+        ];
     }
 
     /**
@@ -43,6 +60,8 @@ class InvoiceSaleListScreen extends Screen
      */
     public function layout(): iterable
     {
-        return [];
+        return [
+            InvoiceSalesListLayout::class,
+        ];
     }
 }

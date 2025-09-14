@@ -98,41 +98,49 @@ Route::screen('company/{company?}', CompanyEditScreen::class)
     ->name('platform.company.edit');
 Route::screen('companies', CompanyListScreen::class)
     ->name('platform.companies.list');
+
 //Rutas para customer edicion y listado
 Route::screen('customer/{customer?}', CustomerEditScreen::class)
     ->name('platform.customer.edit');
 Route::screen('customers', CustomerListScreen::class)
     ->name('platform.customer.list');
+
 //Rutas para Invoice Sales edicion y listado
-Route::screen('invoice-sale/{invoice-sale?}', InvoiceSaleEditScreen::class)
-    ->name('platform.screens.invoice-sale');
+Route::screen('invoice-sale/{invoiceSale?}', InvoiceSaleEditScreen::class)
+    ->name('platform.invoice.sale.edit');
 Route::screen('invoice-sales', InvoiceSaleListScreen::class)
-    ->name('platform.invoicesale.list');
+    ->name('platform.invoice.sale.list');
+
 //Rlutes para Invoice Purchase
 Route::screen('invoice-purchase/{invoice-purchase?}', InvoicePurchaseEditScreen::class)
     ->name('platform.screens.invoice-purchase');
 Route::screen('invoice-purchases', InvoicePurchaseListScreen::class)
     ->name('platform.invoicepurchases.list');
+
 //Route para Product
 Route::screen('product/{product?}', ProductEditScreen::class)
     ->name('platform.product.edit');
 Route::screen('products', ProductListScreen::class)
     ->name('platform.products.list');
+
 //Route para Stock
 Route::screen('stock/{stock}', StockEditScreen::class)
     ->name('platform.stock.edit');
 Route::screen('stocks', StockListScreen::class)
     ->name('platform.stocks.list');
+
 //Route para Movements Stocks
 Route::screen('movement-stock/{movement-stock?}', StockMovementsEditScreen::class)
     ->name('platform.movement-stock.edit');
 Route::screen('movement-stocks', StockMovementsListScreen::class)
     ->name('platform.movement-stocks.list');
+
 //Routes para Supplier
 Route::screen('supplier/{supplier?}', SupplierEditScreen::class)
     ->name('platform.supplier.edit');
 Route::screen('suppliers', SupplierListScreen::class)
     ->name('platform.supplier.list');
+
 //Route para Wharehouse
 Route::screen('wharehouse/{wharehouse?}', WharehouseEditScreen::class)
     ->name('platform.wharehouse.edit');

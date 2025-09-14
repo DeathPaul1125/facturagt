@@ -2,10 +2,10 @@
 
 namespace App\Orchid\Screens;
 
+use App\Models\Supplier;
 use App\Orchid\Layouts\SupplierListLayout;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
-use App\Models\Customer;
 
 class SupplierListScreen extends Screen
 {
@@ -17,7 +17,7 @@ class SupplierListScreen extends Screen
     public function query(): iterable
     {
         return [
-            'suppliers' => Customer::paginate(10),
+            'suppliers' => Supplier::paginate(10),
         ];
     }
 
