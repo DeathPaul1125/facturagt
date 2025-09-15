@@ -13,6 +13,8 @@ class InvoiceSale extends Model
     protected $fillable = [
         'customer_id',
         'date',
+        'nit',
+        'status',
         'series',
         'document_number',
         'total_amount', // Assuming you might have these fields

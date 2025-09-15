@@ -2,6 +2,8 @@
 
 namespace App\Orchid\Layouts;
 
+use App\Models\InvoiceSale;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
 
@@ -25,24 +27,42 @@ class InvoiceSalesListLayout extends Table
     protected function columns(): iterable
     {
         return [
-
-            TD::make('invoice_number', 'Invoice Number')
-                ->sort()
-                ->filter(TD::FILTER_TEXT),
-            TD::make('customer_name', 'Customer Name')
-                ->sort()
-                ->filter(TD::FILTER_TEXT),
-            TD::make('total_amount', 'Total Amount')
+            TD::make('id', 'ID')
                 ->sort()
                 ->filter(TD::FILTER_NUMERIC),
-            TD::make('status', 'Status')
+
+            TD::make('customer.name', 'Cliente')
                 ->sort()
-                ->filter(TD::FILTER_TEXT),
-            TD::make('created_at', 'Created At')
+                ->filter(TD::FILTER_TEXT)
+                ->render(function ($invoiceSale) {
+                    return optional($invoiceSale->customer)->name;
+                }),
+
+            TD::make('total', 'Total')
                 ->sort()
-                ->filter(TD::FILTER_DATE)
-                ->render(function ($invoice) {
-                    return $invoice->created_at->toDateString();
+                ->filter(TD::FILTER_NUMERIC)
+                ->render(function ($invoiceSale) {
+                    return number_format($invoiceSale->total, 2);
+                }),
+            TD::make('status', 'Estado')
+                ->sort()
+                ->filter(TD::FILTER_TEXT)
+                ->render(function ($invoiceSale) {
+                    $colorClass = match ($invoiceSale->status) {
+                        'No-Certificada' => 'text-warning',
+                        'Anulada' => 'text-danger',
+                        'Certificada' => 'text-success',
+                        default => ''
+                    };
+                    return "<span class='{$colorClass}'>{$invoiceSale->status}</span>";
+                }),
+
+            TD::make('actions', 'Acciones')
+                ->alignRight()
+                ->render(function (InvoiceSale $invoiceSale) {
+                    return Link::make('Editar')
+                        ->class('btn btn-info')
+                        ->route('platform.invoice.sale.edit', $invoiceSale);
                 }),
         ];
     }

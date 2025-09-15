@@ -4,7 +4,6 @@ namespace App\Orchid\Screens;
 
 use App\Models\Customer;
 use App\Models\InvoiceSale;
-use App\Models\InvoiceSaleLines;
 use App\Models\Product;
 use Orchid\Alert\Toast;
 use Orchid\Screen\Actions\Button;
@@ -15,7 +14,7 @@ use Orchid\Screen\Fields\Matrix;
 use Orchid\Screen\Fields\Relation;
 use Illuminate\Http\Request;
 use Orchid\Screen\Screen;
-use Orchid\Screen\TD;
+use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 
 class InvoiceSaleEditScreen extends Screen
@@ -28,21 +27,13 @@ class InvoiceSaleEditScreen extends Screen
      */
     public function query(InvoiceSale $invoiceSale): array
     {
-        $this->exists = $invoiceSale->exists;
+        $this->invoiceSale = $invoiceSale;
 
         return [
-            'invoiceSale' => $invoiceSale,
-            'lines' => $invoiceSale->lines
-                ? $invoiceSale->lines->map(function ($line) {
-                    return [
-                        'product_id' => $line->product_id,
-                        'product_name' => $line->product->name,
-                        'quantity'   => $line->quantity,
-                        'price'      => $line->price,
-                        'subtotal'   => $line->subtotal,
-                    ];
-                })->toArray()
-                : [],
+            'invoice' => $invoiceSale,
+            'lines'   =>  $invoiceSale->lines ? $invoiceSale->lines->toArray() : [
+                ['product_id' => '', 'qty' => 1, 'price' => 'lines.price', 'subtotal' => 0],
+            ],
         ];
     }
 
@@ -66,7 +57,7 @@ class InvoiceSaleEditScreen extends Screen
         return [
             Button::make('Guardar')
                 ->icon('floppy')
-                ->method('save'),
+                ->method('createOrUpdate2'),
         ];
     }
 
@@ -79,68 +70,127 @@ class InvoiceSaleEditScreen extends Screen
     {
         return [
             Layout::rows([
+
                 Group::make([
 
-                    Relation::make('invoiceSale.customer_id')
+                    //nit
+                    Relation::make('invoice.nit')
+                        ->title('NIT')
+                        ->fromModel(Customer::class, 'nit')
+                        ->required(),
+
+                    Relation::make('invoice.customer_id')
                         ->title('Cliente')
-                        ->fromModel(Customer::class, 'name'),
+                        ->fromModel(Customer::class, 'name')
+                        ->required(),
 
-                    DateTimer::make('invoiceSale.date')
-                        ->title('Fecha'),
-
-                    Input::make('invoiceSale.total')
-                        ->title('Total')
+                    Input::make('invoice.status')
+                        ->title('Estado')
+                        ->value($this->invoiceSale->status ?? 'No-Certificada')
                         ->readonly(),
-                ])->widthColumns('1fr 1fr 1fr'),
+
+                    Button::make('Certificar')
+                        ->icon('cloud-upload')
+                        ->method('certifyInvoice')
+                        ->class('float-end')
+                        ->canSee($this->invoiceSale->exists),
+                ]),
+
+                Group::make([
+
+                DateTimer::make('invoice.date')
+                    ->title('Fecha')
+                    ->value(now())
+                    ->required(),
+
+                Input::make('invoice.serie_fel')
+                    ->title('Serie')
+                    ->readonly(),
+
+                Input::make('invoice.number_fel')
+                    ->title('Número de documento')
+                    ->readonly(),
+
+                Input::make('invoice.autorization_number_fel')
+                    ->title('Número de documento')
+                    ->readonly(),
+                ]),
 
             ]),
-
-            // Tabla de líneas
             Layout::rows([
                 Matrix::make('lines')
-                    ->title('Detalle de Productos')
+                    ->title('Detalle de factura')
                     ->columns([
-                        'product_id' => 'Producto',
-                        'quantity'   => 'Cantidad',
-                        'price'      => 'Precio',
-                        'subtotal'   => 'Subtotal',
-                    ]),
+                        'Producto' => 'product_id',
+                        'Cantidad' => 'quantity',
+                        'Precio Unitario' => 'unit_price',
+                        'Total Línea' => 'total_price',
+                    ])
+                    ->fields([
+                        'product_id' => Relation::make('lines[].product_id')
+                            ->fromModel(Product::class, 'name')
+                            ->title('Producto')
+                            ->required(),
+                        'quantity' => Input::make('lines[].quantity')
+                            ->type('number')
+                            ->required(),
+                        'unit_price' => Input::make('lines[].unit_price')
+                            ->type('number')
+                            ->required(),
+                        'total_price' => Input::make('lines[].total_price')
+                            ->type('number')
+                            ->readonly(),
+                    ])
+            ]),
+
+            Layout::rows([
+                Group::make([
+
+                Input::make('invoice.total_amount')
+                    ->title('Total')
+                    ->type('number')
+                    ->readonly(),
+
+                Input::make('invoice.tax')
+                    ->title('Impuesto')
+                    ->type('number')
+                    ->readonly(),
+
+                ]),
+
             ]),
         ];
     }
 
-    public function save(InvoiceSale $invoiceSale, Request $request)
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function createOrUpdate2(Request $request)
     {
-        dd('entro'); // 🔥 simple para ver si llega
-        // Guardar encabezado
-        $invoiceSale->fill($request->get('invoiceSale'))->save();
 
-        // Borrar líneas anteriores
-        $invoiceSale->lines()->delete();
+        $factura = $this->invoiceSale->exists
+            ? $this->invoiceSale
+            : new InvoiceSale();
 
-        // Obtener nuevas líneas
-        $lines = $request->get('lines', []);
+        $factura->fill($request->get('invoice'));
+        $factura->save();
 
-        foreach ($lines as $line) {
-            $product = Product::find($line['product_id']);
-
-            if (!$product) {
-                continue;
-            }
-
-            if ($product->stock < $line['quantity']) {
-                Toast::error("No hay suficiente stock para {$product->name}");
-                continue;
-            }
-
-            $invoiceSale->lines()->create([
-                'product_id' => $product->id,
-                'quantity'   => $line['quantity'],
-                'price'      => $product->price,
-                'subtotal'   => $product->price * $line['quantity'],
-            ]);
+        if ($this->invoiceSale->exists) {
+            // Eliminar líneas existentes
+            $factura->lines()->delete();
         }
+        // Crear nuevas líneas
+        foreach ($request->get('lines') as $line) {
+            $factura->lines()->create($line);
+        }
+        Alert::info('Factura guardada correctamente.');
 
-        Toast::info('Factura guardada con éxito.');
+        return redirect()->route('platform.invoice.sale.edit');
+    }
+    public function certifyInvoice()
+    {
+        Alert::info('Certificando la Factura.');
     }
 }
