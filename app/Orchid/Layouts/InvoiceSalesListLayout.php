@@ -38,12 +38,13 @@ class InvoiceSalesListLayout extends Table
                     return optional($invoiceSale->customer)->name;
                 }),
 
-            TD::make('total', 'Total')
+            TD::make('invoice_sales.total_amount', 'Total')
                 ->sort()
                 ->filter(TD::FILTER_NUMERIC)
                 ->render(function ($invoiceSale) {
-                    return number_format($invoiceSale->total, 2);
+                    return number_format($invoiceSale->total_amount, 2);
                 }),
+                
             TD::make('status', 'Estado')
                 ->sort()
                 ->filter(TD::FILTER_TEXT)

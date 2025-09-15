@@ -57,7 +57,7 @@ class InvoiceSaleEditScreen extends Screen
         return [
             Button::make('Guardar')
                 ->icon('floppy')
-                ->method('createOrUpdate2'),
+                ->method('createOrUpdate'),
         ];
     }
 
@@ -139,7 +139,8 @@ class InvoiceSaleEditScreen extends Screen
                             ->required(),
                         'total_price' => Input::make('lines[].total_price')
                             ->type('number')
-                            ->readonly(),
+                            ->readonly()
+                            ->value(0),
                     ])
             ]),
 
@@ -167,7 +168,7 @@ class InvoiceSaleEditScreen extends Screen
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function createOrUpdate2(Request $request)
+    public function createOrUpdate(Request $request)
     {
 
         $factura = $this->invoiceSale->exists
@@ -181,13 +182,18 @@ class InvoiceSaleEditScreen extends Screen
             // Eliminar líneas existentes
             $factura->lines()->delete();
         }
-        // Crear nuevas líneas
+        // Crear nuevas líneas, calculando total_price y sumando total_amount
+        $totalAmount = 0;
         foreach ($request->get('lines') as $line) {
+            $line['total_price'] = (floatval($line['quantity'] ?? 0)) * (floatval($line['unit_price'] ?? 0));
+            $totalAmount += $line['total_price'];
             $factura->lines()->create($line);
         }
+        $factura->total_amount = $totalAmount;
+        $factura->save();
         Alert::info('Factura guardada correctamente.');
 
-        return redirect()->route('platform.invoice.sale.edit');
+        return redirect()->route('platform.invoice.sale.list');
     }
     public function certifyInvoice()
     {
