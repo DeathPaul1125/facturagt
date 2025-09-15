@@ -84,11 +84,13 @@ class CustomerEditScreen extends Screen
     {
         return [
             Layout::rows([
+
                 Button::make('Consulta Nit')
                     ->method('consultaNit')
                     ->icon('search')
                     ->class('btn btn-warning')
                     ->style('margin-top: 30px; margin-bottom: 0px;'),
+
                 Group::make([
 
                     Input::make('customer.nit')
@@ -98,8 +100,7 @@ class CustomerEditScreen extends Screen
 
                     Input::make('customer.name')
                         ->title('Nombre')
-                        ->placeholder('Nombre del cliente')
-                        ->required(),
+                        ->placeholder('Nombre del cliente'),
 
                 ])->widthColumns('1fr 1fr 2fr'),
 
@@ -165,7 +166,7 @@ class CustomerEditScreen extends Screen
         ])->get('https://felgttestaws.digifact.com.gt/gt.com.fel.api.v3/api/sharedInfo', [
             'NIT'      => '44653948',
             'DATA1'    => 'SHARED_GETINFONITcom',
-            'DATA2'    => 'NIT|54731747',
+            'DATA2'    => 'NIT|' . $nit,
             'USERNAME' => 'CIVERNETTEST',
         ]);
         $data = $response->json();
