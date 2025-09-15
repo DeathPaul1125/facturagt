@@ -57,7 +57,14 @@ class InvoiceSaleEditScreen extends Screen
         return [
             Button::make('Guardar')
                 ->icon('floppy')
+                ->class('btn btn-success')
                 ->method('createOrUpdate'),
+
+            Button::make('Eliminar')
+                ->icon('trash')
+                ->class('btn btn-danger')
+                ->method('remove')
+                ->canSee($this->invoiceSale->exists),
         ];
     }
 
@@ -118,6 +125,7 @@ class InvoiceSaleEditScreen extends Screen
 
             ]),
             Layout::rows([
+
                 Matrix::make('lines')
                     ->title('Detalle de factura')
                     ->columns([
@@ -127,16 +135,20 @@ class InvoiceSaleEditScreen extends Screen
                         'Total Línea' => 'total_price',
                     ])
                     ->fields([
+
                         'product_id' => Relation::make('lines[].product_id')
                             ->fromModel(Product::class, 'name')
                             ->title('Producto')
                             ->required(),
+
                         'quantity' => Input::make('lines[].quantity')
                             ->type('number')
                             ->required(),
+
                         'unit_price' => Input::make('lines[].unit_price')
                             ->type('number')
                             ->required(),
+
                         'total_price' => Input::make('lines[].total_price')
                             ->type('number')
                             ->readonly()
@@ -191,6 +203,7 @@ class InvoiceSaleEditScreen extends Screen
         }
         $factura->total_amount = $totalAmount;
         $factura->save();
+
         Alert::info('Factura guardada correctamente.');
 
         return redirect()->route('platform.invoice.sale.list');
@@ -198,5 +211,17 @@ class InvoiceSaleEditScreen extends Screen
     public function certifyInvoice()
     {
         Alert::info('Certificando la Factura.');
+    }
+
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function remove()
+    {
+        $this->invoiceSale->delete();
+
+        Alert::info('Factura eliminada de forma correcta.');
+
+        return redirect()->route('platform.invoice.sale.list');
     }
 }

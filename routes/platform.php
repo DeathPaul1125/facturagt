@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use App\Models\Customer;
 use App\Orchid\Screens\CompanyEditScreen;
 use App\Orchid\Screens\CompanyListScreen;
 use App\Orchid\Screens\CustomerEditScreen;
@@ -145,3 +146,18 @@ Route::screen('wharehouse/{wharehouse?}', WharehouseEditScreen::class)
     ->name('platform.wharehouse.edit');
 Route::screen('wharehouses', WharehouseListScreen::class)
     ->name('platform.wharehouses.list');
+
+    // API para obtener el precio de un producto por ID (accesible desde Orchid)
+use App\Models\Product;
+use Illuminate\Http\Request;
+
+Route::get('/api/product-price/{id}', function ($id) {
+    $product = Product::find($id);
+    return response()->json([
+        'price' => $product ? $product->price : 0
+    ]);
+});
+
+Route::get('/api/customer-by-nit/{nit}', function($nit) {
+    return Customer::where('nit', $nit)->first();
+})->name('api.customer-by-nit');
