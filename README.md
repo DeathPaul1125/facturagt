@@ -25,3 +25,6 @@ Un sistema **ERP Lite** desarrollado con [Laravel](https://laravel.com) y [Orchi
 
 ### Configuracion Empresa
 ![Empresa](screenshots/Empresa.png)
+
+### Pantalla de Creacion de Facturas
+![Empresa](screenshots/Facturas.png)
