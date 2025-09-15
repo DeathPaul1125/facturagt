@@ -55,6 +55,13 @@ class InvoiceSaleEditScreen extends Screen
     public function commandBar(): iterable
     {
         return [
+
+            Button::make('Imprimir')
+                ->icon('printer')
+                ->class('btn btn-primary')
+                ->method('printInvoice')
+                ->canSee($this->invoiceSale->exists),
+
             Button::make('Guardar')
                 ->icon('floppy')
                 ->class('btn btn-success')
@@ -87,8 +94,9 @@ class InvoiceSaleEditScreen extends Screen
                         ->required(),
 
                     Relation::make('invoice.customer_id')
-                        ->title('Cliente')
-                        ->fromModel(Customer::class, 'name')
+                        ->title('Cliente (por NIT)')
+                        ->fromModel(Customer::class, 'nit', 'id')
+                        ->displayAppend('name') // Muestra también el nombre al lado del NIT
                         ->required(),
 
                     Input::make('invoice.status')
@@ -118,7 +126,7 @@ class InvoiceSaleEditScreen extends Screen
                     ->title('Número de documento')
                     ->readonly(),
 
-                Input::make('invoice.autorization_number_fel')
+                Input::make('invoice.authorization_number_fel')
                     ->title('Número de documento')
                     ->readonly(),
                 ]),
@@ -210,7 +218,152 @@ class InvoiceSaleEditScreen extends Screen
     }
     public function certifyInvoice()
     {
-        Alert::info('Certificando la Factura.');
+        //cargamos la informacion de la empresa
+        $company = \App\Models\Company::first();
+        if (!$company) {
+            Alert::error('No se ha configurado la información de la empresa. Por favor, configúrela primero.');
+            return;
+        }
+        $nit = $company->nit;
+        $nit_fel = str_pad($company->nit, 12, '0', STR_PAD_LEFT);
+        //P1ara certificar factura en Digifact
+        $client = new \GuzzleHttp\Client();
+        $url = 'https://felgttestaws.digifact.com.gt/felapiv2/api/FelRequest?NIT='.$nit_fel.'&TIPO=CERTIFICATE_DTE_XML_TOSIGN&FORMAT=XML&USERNAME='.$company->user_fel;
+        $xml = $this->generarXmlFactura($this->invoiceSale, $company);
+
+        $token = $company->token_fel;
+
+        $headers = [
+            'Authorization: Bearer ' . $token,
+            'Content-Type: application/xml'
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 300);
+        $dataxml = curl_exec($ch);
+        if (curl_errno($ch)) {
+            print curl_errno($ch);
+            echo "  Algo Salio Mal";
+        } else {
+            curl_close($ch);
+        }
+        //Procesamos la respuesta
+        $json = json_decode($dataxml);
+
+        $this->invoiceSale->status = 'Certificada';
+        $this->invoiceSale->serie_fel = $json->Serie;
+        $this->invoiceSale->number_fel = $json->NUMERO;
+        $this->invoiceSale->authorization_number_fel = $json->Autorizacion;
+        $this->invoiceSale->save();
+
+        Alert::info('Factura certificada correctamente.');
+
+        return redirect()->route('platform.invoice.sale.list');
+    }
+
+    /**
+     * Genera el XML para la factura electrónica según formato SAT
+     *
+     * @param InvoiceSale $factura
+     * @param \App\Models\Company $company
+     * @return string
+     */
+    private function generarXmlFactura(InvoiceSale $factura, $company): string
+    {
+        // Obtener cliente
+        $cliente = Customer::find($factura->customer_id);
+
+        // Formato de fecha requerido
+        $fechaEmision = date('Y-m-d\TH:i:s', strtotime($factura->date));
+
+        // Calcular totales e impuestos
+        $totalImpuesto = $factura->tax ?? ($factura->total_amount / 1.12) * 0.12;
+        $montoGravable = $factura->total_amount - $totalImpuesto;
+
+        // Iniciar construcción del XML
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+            <dte:GTDocumento xmlns:dte="http://www.sat.gob.gt/dte/fel/0.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="0.1">
+              <dte:SAT ClaseDocumento="dte">
+                <dte:DTE ID="DatosCertificados">
+                  <dte:DatosEmision ID="DatosEmision">
+                    <dte:DatosGenerales Tipo="FACT" FechaHoraEmision="' . $fechaEmision . '" CodigoMoneda="GTQ"/>
+                    <dte:Emisor NITEmisor="' . $company->nit . '" NombreEmisor="' . $company->name . '" CodigoEstablecimiento="1" NombreComercial="' . $company->name . '" AfiliacionIVA="GEN">
+                      <dte:DireccionEmisor>
+                        <dte:Direccion>' . $company->address . '</dte:Direccion>
+                        <dte:CodigoPostal>' . $company->zip . '</dte:CodigoPostal>
+                        <dte:Municipio>' . $company->city . '</dte:Municipio>
+                        <dte:Departamento>' . $company->state . '</dte:Departamento>
+                        <dte:Pais>GT</dte:Pais>
+                      </dte:DireccionEmisor>
+                    </dte:Emisor>
+                    <dte:Receptor NombreReceptor="' . $cliente->name . '" IDReceptor="' . $cliente->nit . '">
+                      <dte:DireccionReceptor>
+                        <dte:Direccion>' . ($cliente->address ?? 'GUATEMALA') . '</dte:Direccion>
+                        <dte:CodigoPostal>' . ($cliente->postal_code ?? '01010') . '</dte:CodigoPostal>
+                        <dte:Municipio>' . ($cliente->municipality ?? 'GUATEMALA') . '</dte:Municipio>
+                        <dte:Departamento>' . ($cliente->department ?? 'GUATEMALA') . '</dte:Departamento>
+                        <dte:Pais>GT</dte:Pais>
+                      </dte:DireccionReceptor>
+                    </dte:Receptor>
+                    <dte:Frases>
+                      <dte:Frase TipoFrase="1" CodigoEscenario="1"/>
+                    </dte:Frases>
+                    <dte:Items>';
+
+                    // Agregar cada línea de la factura
+                    $numeroLinea = 1;
+                    foreach ($factura->lines as $linea) {
+                        $producto = Product::find($linea->product_id);
+                        $precioTotal = $linea->quantity * $linea->unit_price;
+                        $montoGravableLinea = $precioTotal / 1.12;
+                        $impuestoLinea = $precioTotal - $montoGravableLinea;
+
+                        $xml .= '
+                      <dte:Item NumeroLinea="' . $numeroLinea . '" BienOServicio="B">
+                        <dte:Cantidad>' . $linea->quantity . '</dte:Cantidad>
+                        <dte:UnidadMedida>und</dte:UnidadMedida>
+                        <dte:Descripcion>' . $producto->name . '</dte:Descripcion>
+                        <dte:PrecioUnitario>' . $linea->unit_price . '</dte:PrecioUnitario>
+                        <dte:Precio>' . $precioTotal . '</dte:Precio>
+                        <dte:Descuento>0</dte:Descuento>
+                        <dte:Impuestos>
+                          <dte:Impuesto>
+                            <dte:NombreCorto>IVA</dte:NombreCorto>
+                            <dte:CodigoUnidadGravable>1</dte:CodigoUnidadGravable>
+                            <dte:MontoGravable>' . number_format($montoGravableLinea, 6, '.', '') . '</dte:MontoGravable>
+                            <dte:MontoImpuesto>' . number_format($impuestoLinea, 6, '.', '') . '</dte:MontoImpuesto>
+                          </dte:Impuesto>
+                        </dte:Impuestos>
+                        <dte:Total>' . $precioTotal . '</dte:Total>
+                      </dte:Item>';
+
+                        $numeroLinea++;
+                    }
+
+                    // Cerrar el XML con los totales
+                    $xml .= '
+                    </dte:Items>
+                    <dte:Totales>
+                      <dte:TotalImpuestos>
+                        <dte:TotalImpuesto NombreCorto="IVA" TotalMontoImpuesto="' . number_format($totalImpuesto, 6, '.', '') . '"/>
+                      </dte:TotalImpuestos>
+                      <dte:GranTotal>' . $factura->total_amount . '</dte:GranTotal>
+                    </dte:Totales>
+                  </dte:DatosEmision>
+                </dte:DTE>
+              </dte:SAT>
+        </dte:GTDocumento>';
+
+        return $xml;
     }
 
     /**
@@ -223,5 +376,10 @@ class InvoiceSaleEditScreen extends Screen
         Alert::info('Factura eliminada de forma correcta.');
 
         return redirect()->route('platform.invoice.sale.list');
+    }
+
+    public function printInvoice()
+    {
+        Alert::info('Funcionalidad de impresión no implementada aún.');
     }
 }

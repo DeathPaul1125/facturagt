@@ -16,6 +16,9 @@ class InvoiceSale extends Model
         'nit',
         'status',
         'series',
+        'authorization_number_fel',
+        'serie_fel',
+        'number_fel',
         'document_number',
         'total_amount', // Assuming you might have these fields
         'tax',          // Assuming you might have these fields

@@ -17,4 +17,9 @@ class Customer extends Model
         'phone2',
         'email',
     ];
+
+    public function scopeByNit($query, $nit)
+    {
+        return $query->where('nit', $nit);
+    }
 }
